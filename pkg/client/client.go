@@ -19,9 +19,39 @@ type Client struct {
 }
 
 type Query struct {
-	url string
-	apiKey string
+	url        string
+	apiKey     string
 	timeSeries bool
+}
+
+func (c *Client) GetInventory() (inv Inventory, err error) {
+	id := InventoryData{}
+
+	if !c.isConfigured() {
+		return inv, errors.New("client is not configured")
+	}
+
+	var q = strings.Join([]string{baseurl, "site", c.siteId, "inventory"}, "/")
+	query := Query{q, c.apiKey, false}
+
+	resp, err := http.Get(query.build())
+	if err != nil {
+		return inv, err
+	}
+	defer resp.Body.Close()
+
+	body, err := ioutil.ReadAll(resp.Body)
+	if err != nil {
+		return inv, err
+	}
+
+	err = json.Unmarshal(body, &id)
+	if err != nil {
+		return inv, err
+	}
+	inv = id.Inventory
+
+	return inv, err
 }
 
 func (c *Client) GetEquipmentTelemetry(serial string) (et EquipmentTelemetry, err error) {
@@ -29,7 +59,7 @@ func (c *Client) GetEquipmentTelemetry(serial string) (et EquipmentTelemetry, er
 		return et, errors.New("client is not configured")
 	}
 
-	var q = strings.Join([]string{baseurl, "equipment", c.siteId, serial, "data"},"/")
+	var q = strings.Join([]string{baseurl, "equipment", c.siteId, serial, "data"}, "/")
 	query := Query{q, c.apiKey, true}
 
 	resp, err := http.Get(query.build())
@@ -83,5 +113,3 @@ func getStartTimeStr() string {
 func getEndTimeStr() string {
 	return url.QueryEscape(time.Now().Format(timeFormat))
 }
-
-
