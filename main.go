@@ -1,9 +1,13 @@
 package main
 
 import (
-	"fmt"
+	"github.com/mlsorensen/solaredge/internal/routehandler"
 	"github.com/mlsorensen/solaredge/pkg/client"
+	"log"
+	"net/http"
 	"os"
+
+	"github.com/gorilla/mux"
 )
 
 const (
@@ -14,25 +18,20 @@ const (
 func main() {
 	c := client.Client{}
 
-	// client checks if it is configured and returns errors, no need to check
+	// client checks if it is configured and returns errors, no need to check if these are empty
 	c.SetSiteId(os.Getenv(siteIdEnvVar))
 	c.SetApiKey(os.Getenv(apiKeyEnvVar))
 
-	data, err := c.GetEquipmentTelemetry("73036092-68")
-	if err != nil {
-		panic(err)
-	}
+	r := mux.NewRouter()
 
-	fmt.Printf("Got data with %d items\n", data.Data.Count)
+	fs := http.FileServer(http.Dir("./static"))
+	r.PathPrefix("/static/").Handler(http.StripPrefix("/static/", fs))
 
-	inv, err := c.GetInventory()
-	if err != nil {
-		panic(err)
-	}
+	api := r.PathPrefix("/api").Subrouter()
+	api.HandleFunc("/inventory", routehandler.Inventory).Methods("GET")
+	api.HandleFunc("/equipmentTelemetry/{serial}", routehandler.EquipmentTelemetry).Methods("GET")
 
-	fmt.Printf("Found inventory: %d inverters, %d batteries\n", len(inv.Inverters), len(inv.Batteries))
+	http.Handle("/", r)
 
-	for _, v := range inv.Inverters {
-		fmt.Printf("Found inverter: %s, %s\n", v.Name, v.SerialNumber)
-	}
+	log.Fatal(http.ListenAndServe(":8080", nil))
 }
