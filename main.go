@@ -3,15 +3,20 @@ package main
 import (
 	"fmt"
 	"github.com/mlsorensen/solaredge/pkg/client"
+	"os"
 )
 
-const apiKey = "YYGC5OTPQOD8BIDWC47WWJJ5AQX5WQCV"
-const siteId = "2001637"
+const (
+	siteIdEnvVar = "SITEID"
+	apiKeyEnvVar = "APIKEY"
+)
 
 func main() {
 	c := client.Client{}
-	c.SetSiteId(siteId)
-	c.SetApiKey(apiKey)
+
+	// client checks if it is configured and returns errors, no need to check
+	c.SetSiteId(os.Getenv(siteIdEnvVar))
+	c.SetApiKey(os.Getenv(apiKeyEnvVar))
 
 	data, err := c.GetEquipmentTelemetry("73036092-68")
 	if err != nil {
