@@ -13,20 +13,19 @@ func main() {
 	c.SetSiteId(siteId)
 	c.SetApiKey(apiKey)
 
-	/*
-		data, err := c.GetEquipmentTelemetry("73036092-68")
-		if err != nil {
-			panic(err)
-		}
+	data, err := c.GetEquipmentTelemetry("73036092-68")
+	if err != nil {
+		panic(err)
+	}
 
-		fmt.Printf("Got data with %d items\n", data.Data.Count)
-	*/
+	fmt.Printf("Got data with %d items\n", data.Data.Count)
+
 	inv, err := c.GetInventory()
 	if err != nil {
 		panic(err)
 	}
 
-	fmt.Printf("Found inventory: %d inverters, %d batteries", len(inv.Inverters), len(inv.Batteries))
+	fmt.Printf("Found inventory: %d inverters, %d batteries\n", len(inv.Inverters), len(inv.Batteries))
 
 	for _, v := range inv.Inverters {
 		fmt.Printf("Found inverter: %s, %s\n", v.Name, v.SerialNumber)

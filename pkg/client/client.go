@@ -18,33 +18,14 @@ type Client struct {
 	siteId string
 }
 
-type Query struct {
-	url        string
-	apiKey     string
-	timeSeries bool
-}
-
 func (c *Client) GetInventory() (inv Inventory, err error) {
-	id := InventoryData{}
-
-	if !c.isConfigured() {
-		return inv, errors.New("client is not configured")
-	}
-
 	var q = strings.Join([]string{baseurl, "site", c.siteId, "inventory"}, "/")
-	query := Query{q, c.apiKey, false}
-
-	resp, err := http.Get(query.build())
-	if err != nil {
-		return inv, err
-	}
-	defer resp.Body.Close()
-
-	body, err := ioutil.ReadAll(resp.Body)
+	body, err := c.get(q, false)
 	if err != nil {
 		return inv, err
 	}
 
+	id := InventoryData{}
 	err = json.Unmarshal(body, &id)
 	if err != nil {
 		return inv, err
@@ -55,20 +36,9 @@ func (c *Client) GetInventory() (inv Inventory, err error) {
 }
 
 func (c *Client) GetEquipmentTelemetry(serial string) (et EquipmentTelemetry, err error) {
-	if !c.isConfigured() {
-		return et, errors.New("client is not configured")
-	}
-
 	var q = strings.Join([]string{baseurl, "equipment", c.siteId, serial, "data"}, "/")
-	query := Query{q, c.apiKey, true}
 
-	resp, err := http.Get(query.build())
-	if err != nil {
-		return et, err
-	}
-	defer resp.Body.Close()
-
-	body, err := ioutil.ReadAll(resp.Body)
+	body, err := c.get(q, true)
 	if err != nil {
 		return et, err
 	}
@@ -84,6 +54,26 @@ func (c *Client) isConfigured() bool {
 	return true
 }
 
+func (c *Client) get(u string, needTime bool) ([]byte, error) {
+	if !c.isConfigured() {
+		return []byte{}, errors.New("client is not configured")
+	}
+
+	u = c.appendApiKey(u)
+	if needTime {
+		u = c.appendTimeFrame(u)
+	}
+
+	resp, err := http.Get(u)
+	if err != nil {
+		return []byte{}, err
+	}
+	defer resp.Body.Close()
+
+	bytes, err := ioutil.ReadAll(resp.Body)
+	return bytes, err
+}
+
 func (c *Client) SetApiKey(s string) {
 	c.apiKey = s
 }
@@ -92,15 +82,11 @@ func (c *Client) SetSiteId(s string) {
 	c.siteId = s
 }
 
-func (q *Query) build() string {
-	var u = q.url + "?api_key=" + q.apiKey
-	if q.timeSeries {
-		u = appendTimeFrame(u)
-	}
-	return u
+func (c *Client) appendApiKey(query string) string {
+	return query + "?api_key=" + c.apiKey
 }
 
-func appendTimeFrame(query string) string {
+func (c *Client) appendTimeFrame(query string) string {
 	return query + "&startTime=" + getStartTimeStr() + "&endTime=" + getEndTimeStr()
 }
 
