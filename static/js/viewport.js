@@ -1,5 +1,6 @@
 'use strict';
-const { useState, useEffect, useRef } = React
+const { useState, useEffect } = React
+const {XYPlot, XAxis, YAxis, HorizontalGridLines, LineMarkSeries, VerticalBarSeries, AreaSeries} = reactVis;
 
 function CtoF(c) {
     return ((c * 9/5) + 32).toFixed(2)
@@ -27,7 +28,6 @@ function Battery(props) {
     } else if (details.telemetryCount === 0) {
         return <div className={"inverter-detail"}>Loading...</div>
     } else {
-        console.log(details)
         let last = details.telemetries[details.telemetries.length - 1]
         let powerClassName = (last.power < 0 ? "text-warning" : "") + (last.power > 0 ? "text-success" : "")
         return (
@@ -47,9 +47,44 @@ function Battery(props) {
                 <div className={"row"}>
                     <div className={"col-12"}>Temp: {CtoF(last.internalTemp)}&deg;F</div>
                 </div>
+                <div className={""} >
+                        <BatteryTelemetryChart telemetries={details.telemetries}/>
+                </div>
+                <div className={""} >
+                    <BatteryPercentageChart telemetries={details.telemetries}/>
+                </div>
                 </span>
         )
     }
+}
+
+function BatteryTelemetryChart(props) {
+    const data = props.telemetries.map(function(t,i) {
+        return ({x: i, y: t.power, y0:0})
+    })
+
+    return (
+        <XYPlot width={350} height={150} className="row"  >
+            <HorizontalGridLines />
+            <XAxis hideTicks/>
+            <YAxis />
+            <AreaSeries curve="curveNatural" data={data} color={'#4b7fa1'}/>
+        </XYPlot>
+    )
+}
+
+function BatteryPercentageChart(props) {
+    const data = props.telemetries.map(function(t,i) {
+        return ({x: i, y: t.batteryPercentageState, y0:0})
+    })
+    return (
+        <XYPlot width={350} height={150} className="row"  >
+            <HorizontalGridLines />
+            <XAxis hideTicks/>
+            <YAxis />
+            <AreaSeries curve="curveNatural" opacity={0.5} data={data} stroke={'#4ba19e'}/>
+        </XYPlot>
+    )
 }
 
 function InverterDetail(props) {
@@ -139,7 +174,6 @@ function App() {
             <div className="container">
                 {items.inverters.map((v, i) => {
                     let b = items.batteries.find( element => element.connectedInverterSn === v.SN )
-                    console.log(b)
                     return <Inverter inverter={v} battery={b} num={i} key={i}/>
                 })}
             </div>
