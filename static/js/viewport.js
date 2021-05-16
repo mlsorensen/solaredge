@@ -29,13 +29,24 @@ function Battery(props) {
     } else {
         console.log(details)
         let last = details.telemetries[details.telemetries.length - 1]
+        let powerClassName = (last.power < 0 ? "text-warning" : "") + (last.power > 0 ? "text-success" : "")
         return (
-                <span>
-                <div className={"row bg-primary bg-gradient text-white"}>{props.battery.name}</div>
-                <div className={"row bg-light"}>{props.battery.SN}</div>
-                <div className={"row bg-light " + (last.power < 0 ? "text-warning" : "") + (last.power > 0 ? "text-success" : "")}>Rate: {last.power.toFixed(2)}VA</div>
-                <div className={"row bg-light"}>Level: {last.batteryPercentageState.toFixed(2)}%</div>
-                <div className={"row bg-light"}>Temp: {CtoF(last.internalTemp)}&deg;F</div>
+                <span className={"border-left border-dark"}>
+                <div className={"row bg-primary bg-gradient text-white"}>
+                    <div className={"col-12"}>{props.battery.name}</div>
+                </div>
+                <div className={"row"}>
+                    <div className={"col-12"}>{props.battery.SN}</div>
+                </div>
+                <div className={"row"}>
+                    <div className={"col-12"}>Rate: <span className={powerClassName}> {last.power.toFixed(2)}VA </span></div>
+                </div>
+                <div className={"row"}>
+                    <div className={"col-12"}>Level: {last.batteryPercentageState.toFixed(2)}%</div>
+                </div>
+                <div className={"row"}>
+                    <div className={"col-12"}>Temp: {CtoF(last.internalTemp)}&deg;F</div>
+                </div>
                 </span>
         )
     }
@@ -67,12 +78,12 @@ function InverterDetail(props) {
         return (
             <div className={"inverter-detail"}>
                 <div className="row">
-                    <div className="col-sm-4">Mode: {last.inverterMode}</div>
-                    <div className="col-sm-4">Temp: {CtoF(last.temperature)}&deg;F</div>
+                    <div className="col-6">Mode: {last.inverterMode}</div>
+                    <div className="col-6">Temp: {CtoF(last.temperature)}&deg;F</div>
                 </div>
                 <div className="row">
-                    <div className="col-sm-4">Power: {last.L1Data.apparentPower.toFixed(2)}VA</div>
-                    <div className="col-sm-4">Panels: {props.inverter.connectedOptimizers}</div>
+                    <div className="col-6">Power: {last.L1Data.apparentPower.toFixed(2)}VA</div>
+                    <div className="col-6">Panels: {props.inverter.connectedOptimizers}</div>
                 </div>
             </div>
         )
@@ -82,15 +93,17 @@ function InverterDetail(props) {
 function Inverter(props) {
     return (
         <div className="inverter row p-1" key={props.num}>
-            <span className="rounded border border-dark">
+            <span className="rounded border border-dark overflow-hidden">
                 <div className="row bg-dark bg-gradient text-white">
-                    <div className="col-sm-2">{props.inverter.name}</div>
-                    <div className="col-sm-4">Serial: {props.inverter.SN}</div>
-                    <div className="col-sm-6">Model: {props.inverter.model}</div>
+                    <div className="col-2">{props.inverter.name}</div>
+                    <div className="col-4">Serial: {props.inverter.SN}</div>
+                    <div className="col-6">Model: {props.inverter.model}</div>
                 </div>
                 <div className="row">
-                    <div className="col-sm-8 inverter-container"><InverterDetail inverter={props.inverter}/></div>
-                    <span className="col-sm-4 battery-container rounded border border-dark"><Battery battery={props.battery}/></span>
+                    <div className="col-8 inverter-container bg-light"><InverterDetail inverter={props.inverter}/></div>
+                    <div className="col-4 battery-container border-dark border-left" style={{"backgroundColor": "#ececec","borderLeft":"1px solid black"}}>
+                        <Battery battery={props.battery}/>
+                    </div>
                 </div>
             </span>
         </div>
