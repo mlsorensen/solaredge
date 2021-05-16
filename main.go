@@ -16,11 +16,8 @@ const (
 )
 
 func main() {
-	solarEdgeClient := client.Client{}
 	// client checks if it is configured and returns errors, no need to check if these are empty
-	solarEdgeClient.SetSiteId(os.Getenv(siteIdEnvVar))
-	solarEdgeClient.SetApiKey(os.Getenv(apiKeyEnvVar))
-	routehandler.Init(&solarEdgeClient)
+	client.InitClient(os.Getenv(apiKeyEnvVar), os.Getenv(siteIdEnvVar), 300)
 
 	r := mux.NewRouter()
 

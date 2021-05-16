@@ -8,14 +8,8 @@ import (
 	"net/http"
 )
 
-var solarEdgeClient *client.Client
-
-func Init(c *client.Client) {
-	solarEdgeClient = c
-}
-
 func Inventory(w http.ResponseWriter, req *http.Request) {
-	inv, err := solarEdgeClient.GetInventory()
+	inv, err := client.GetClient().GetInventory()
 	if err != nil {
 		fmt.Printf("failed to get inventory, %v\n", err)
 		w.WriteHeader(http.StatusInternalServerError)
@@ -33,7 +27,7 @@ func Inventory(w http.ResponseWriter, req *http.Request) {
 }
 
 func Inverters(w http.ResponseWriter, req *http.Request) {
-	inv, err := solarEdgeClient.GetInventory()
+	inv, err := client.GetClient().GetInventory()
 	if err != nil {
 		fmt.Printf("failed to get inverters, %v\n", err)
 		w.WriteHeader(http.StatusInternalServerError)
@@ -51,7 +45,7 @@ func Inverters(w http.ResponseWriter, req *http.Request) {
 }
 
 func Batteries(w http.ResponseWriter, req *http.Request) {
-	inv, err := solarEdgeClient.GetInventory()
+	inv, err := client.GetClient().GetInventory()
 	if err != nil {
 		fmt.Printf("failed to get batteries, %v\n", err)
 		w.WriteHeader(http.StatusInternalServerError)
@@ -69,7 +63,7 @@ func Batteries(w http.ResponseWriter, req *http.Request) {
 }
 
 func Meters(w http.ResponseWriter, req *http.Request) {
-	inv, err := solarEdgeClient.GetInventory()
+	inv, err := client.GetClient().GetInventory()
 	if err != nil {
 		fmt.Printf("failed to get meters, %v\n", err)
 		w.WriteHeader(http.StatusInternalServerError)
@@ -88,7 +82,7 @@ func Meters(w http.ResponseWriter, req *http.Request) {
 
 func InverterTelemetry(w http.ResponseWriter, req *http.Request) {
 	vars := mux.Vars(req)
-	data, err := solarEdgeClient.GetEquipmentTelemetry(vars["serial"])
+	data, err := client.GetClient().GetInverterTelemetry(vars["serial"])
 
 	if err != nil {
 		fmt.Printf("failed to get inventory telemetry, %v\n", err)
@@ -105,26 +99,26 @@ func InverterTelemetry(w http.ResponseWriter, req *http.Request) {
 }
 
 func BatteryTelemetry(w http.ResponseWriter, req *http.Request) {
-	vars := mux.Vars(req)
-	data, err := solarEdgeClient.GetBatteryTelemetry(vars["serial"])
+	serial := mux.Vars(req)["serial"]
+	data, err := client.GetClient().GetBatteryTelemetry()
 
 	if err != nil {
 		fmt.Printf("failed to get battery telemetry, %v\n", err)
 		w.WriteHeader(http.StatusInternalServerError)
 	}
 
-	if len(data.StorageData.Batteries) == 0 {
-		fmt.Printf("failed to find a battery by serial %s\n", vars["serial"])
-		w.WriteHeader(http.StatusNotFound)
-		return
+	for _, v := range data.StorageData.Batteries {
+		if v.SerialNumber == serial {
+			resp, err := json.Marshal(v)
+			if err != nil {
+				fmt.Printf("failed to unmarshal battery telemetry, %v\n", err)
+				w.WriteHeader(http.StatusInternalServerError)
+			}
+			w.Write(resp)
+			return
+		}
 	}
 
-	resp, err := json.Marshal(data.StorageData.Batteries[0])
-	if err != nil {
-		fmt.Printf("failed to unmarshal battery telemetry, %v\n", err)
-		w.WriteHeader(http.StatusInternalServerError)
-	}
-
-	w.Write(resp)
-
+	fmt.Printf("Failed to find battery by serial %s", serial)
+	w.WriteHeader(http.StatusNotFound)
 }

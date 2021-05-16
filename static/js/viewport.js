@@ -30,13 +30,13 @@ function Battery(props) {
         console.log(details)
         let last = details.telemetries[details.telemetries.length - 1]
         return (
-            <div className="battery">
+                <span>
                 <div className={"row bg-primary bg-gradient text-white"}>{props.battery.name}</div>
                 <div className={"row bg-light"}>{props.battery.SN}</div>
                 <div className={"row bg-light " + (last.power < 0 ? "text-warning" : "") + (last.power > 0 ? "text-success" : "")}>Rate: {last.power.toFixed(2)}VA</div>
                 <div className={"row bg-light"}>Level: {last.batteryPercentageState.toFixed(2)}%</div>
                 <div className={"row bg-light"}>Temp: {CtoF(last.internalTemp)}&deg;F</div>
-            </div>
+                </span>
         )
     }
 }
@@ -81,16 +81,18 @@ function InverterDetail(props) {
 
 function Inverter(props) {
     return (
-        <div className="inverter" key={props.num}>
-            <div className="row bg-dark bg-gradient text-white">
-                <div className="col-sm-2">{props.inverter.name}</div>
-                <div className="col-sm-4">Serial: {props.inverter.SN}</div>
-                <div className="col-sm-6">Model: {props.inverter.model}</div>
-            </div>
-            <div className="row">
-                <div className="col-sm-8 inverter-container"><InverterDetail inverter={props.inverter}/></div>
-                <div className="col-sm-4 battery-container"><Battery battery={props.battery}/></div>
-            </div>
+        <div className="inverter row p-1" key={props.num}>
+            <span className="rounded border border-dark">
+                <div className="row bg-dark bg-gradient text-white">
+                    <div className="col-sm-2">{props.inverter.name}</div>
+                    <div className="col-sm-4">Serial: {props.inverter.SN}</div>
+                    <div className="col-sm-6">Model: {props.inverter.model}</div>
+                </div>
+                <div className="row">
+                    <div className="col-sm-8 inverter-container"><InverterDetail inverter={props.inverter}/></div>
+                    <span className="col-sm-4 battery-container rounded border border-dark"><Battery battery={props.battery}/></span>
+                </div>
+            </span>
         </div>
     )
 }
