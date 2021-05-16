@@ -17,7 +17,7 @@ const (
 
 func main() {
 	// client checks if it is configured and returns errors, no need to check if these are empty
-	client.InitClient(os.Getenv(apiKeyEnvVar), os.Getenv(siteIdEnvVar), 300)
+	client.InitClient(os.Getenv(apiKeyEnvVar), os.Getenv(siteIdEnvVar), 1800)
 
 	r := mux.NewRouter()
 
@@ -29,8 +29,8 @@ func main() {
 	api.HandleFunc("/inventory/inverters", routehandler.Inverters).Methods("GET")
 	api.HandleFunc("/inventory/batteries", routehandler.Batteries).Methods("GET")
 	api.HandleFunc("/inventory/meters", routehandler.Meters).Methods("GET")
-	api.HandleFunc("/inventory/inverters/{serial}/telemetry", routehandler.InverterTelemetry).Methods("GET")
-	api.HandleFunc("/inventory/batteries/{serial}/telemetry", routehandler.BatteryTelemetry).Methods("GET")
+	api.HandleFunc("/telemetry/inverters/{serial}", routehandler.InverterTelemetry).Methods("GET")
+	api.HandleFunc("/telemetry/batteries/{serial}", routehandler.BatteryTelemetry).Methods("GET")
 
 	http.Handle("/", r)
 

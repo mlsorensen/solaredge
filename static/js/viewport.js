@@ -10,7 +10,7 @@ function Battery(props) {
     const [details, setDetails] = useState({ telemetryCount: 0, telemetries: []});
 
     useEffect(() => {
-        fetch("../api/inventory/batteries/" + props.battery.SN + "/telemetry")
+        fetch("../api/telemetry/batteries/" + props.battery.SN)
             .then(res => res.json())
             .then(
                 (result) => {
@@ -46,7 +46,7 @@ function InverterDetail(props) {
     const [details, setDetails] = useState({ count: 0, telemetries: []});
 
     useEffect(() => {
-        fetch("../api/inventory/inverters/" + props.inverter.SN + "/telemetry")
+        fetch("../api/telemetry/inverters/" + props.inverter.SN)
             .then(res => res.json())
             .then(
                 (result) => {
