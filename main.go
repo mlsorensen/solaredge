@@ -17,7 +17,7 @@ const (
 
 func main() {
 	// client checks if it is configured and returns errors, no need to check if these are empty
-	client.InitClient(os.Getenv(apiKeyEnvVar), os.Getenv(siteIdEnvVar), 1800)
+	client.InitClient(os.Getenv(apiKeyEnvVar), os.Getenv(siteIdEnvVar), 600)
 
 	r := mux.NewRouter()
 

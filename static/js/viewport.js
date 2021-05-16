@@ -1,6 +1,6 @@
 'use strict';
 const { useState, useEffect } = React
-const {XYPlot, XAxis, YAxis, HorizontalGridLines, LineMarkSeries, VerticalBarSeries, AreaSeries} = reactVis;
+const {XYPlot, XAxis, YAxis, HorizontalGridLines, FlexibleWidthXYPlot, LineMarkSeries, VerticalBarSeries, AreaSeries} = reactVis;
 
 function CtoF(c) {
     return ((c * 9/5) + 32).toFixed(2)
@@ -64,12 +64,12 @@ function BatteryTelemetryChart(props) {
     })
 
     return (
-        <XYPlot width={350} height={150} className="row"  >
+        <FlexibleWidthXYPlot height={150} className="row"  >
             <HorizontalGridLines />
             <XAxis hideTicks/>
             <YAxis />
             <AreaSeries curve="curveNatural" data={data} color={'#4b7fa1'}/>
-        </XYPlot>
+        </FlexibleWidthXYPlot>
     )
 }
 
@@ -78,12 +78,12 @@ function BatteryPercentageChart(props) {
         return ({x: i, y: t.batteryPercentageState, y0:0})
     })
     return (
-        <XYPlot width={350} height={150} className="row"  >
+        <FlexibleWidthXYPlot height={150} className="row"  >
             <HorizontalGridLines />
             <XAxis hideTicks/>
             <YAxis />
             <AreaSeries curve="curveNatural" opacity={0.5} data={data} stroke={'#4ba19e'}/>
-        </XYPlot>
+        </FlexibleWidthXYPlot>
     )
 }
 
