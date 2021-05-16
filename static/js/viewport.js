@@ -47,42 +47,38 @@ function Battery(props) {
                 <div className={"row"}>
                     <div className={"col-12"}>Temp: {CtoF(last.internalTemp)}&deg;F</div>
                 </div>
-                <div className={""} >
-                        <BatteryTelemetryChart telemetries={details.telemetries}/>
+                <div>
+                    <GenericFlexWidthChart
+                        data={details.telemetries.map(
+                            function(t,i) {
+                                return {x: i, y: t.power, y0:0}
+                            }
+                        )}
+                        color={'#4b7fa1'}
+                    />
                 </div>
-                <div className={""} >
-                    <BatteryPercentageChart telemetries={details.telemetries}/>
+                <div>
+                    <GenericFlexWidthChart
+                        data={details.telemetries.map(
+                            function(t,i) {
+                                return {x: i, y: t.batteryPercentageState, y0:0}
+                            }
+                        )}
+                        color={'#4ba19e'}
+                    />
                 </div>
                 </span>
         )
     }
 }
 
-function BatteryTelemetryChart(props) {
-    const data = props.telemetries.map(function(t,i) {
-        return ({x: i, y: t.power, y0:0})
-    })
-
+function GenericFlexWidthChart(props) {
     return (
         <FlexibleWidthXYPlot height={150} className="row"  >
             <HorizontalGridLines />
             <XAxis hideTicks/>
             <YAxis />
-            <AreaSeries curve="curveNatural" data={data} color={'#4b7fa1'}/>
-        </FlexibleWidthXYPlot>
-    )
-}
-
-function BatteryPercentageChart(props) {
-    const data = props.telemetries.map(function(t,i) {
-        return ({x: i, y: t.batteryPercentageState, y0:0})
-    })
-    return (
-        <FlexibleWidthXYPlot height={150} className="row"  >
-            <HorizontalGridLines />
-            <XAxis hideTicks/>
-            <YAxis />
-            <AreaSeries curve="curveNatural" opacity={0.5} data={data} stroke={'#4ba19e'}/>
+            <AreaSeries curve="curveNatural" data={props.data} color={props.color}/>
         </FlexibleWidthXYPlot>
     )
 }
@@ -120,6 +116,27 @@ function InverterDetail(props) {
                     <div className="col-6">Power: {last.L1Data.apparentPower.toFixed(2)}VA</div>
                     <div className="col-6">Panels: {props.inverter.connectedOptimizers}</div>
                 </div>
+                <div>
+                    <GenericFlexWidthChart
+                        data={details.telemetries.map(
+                            function(t,i) {
+                                return {x: i, y: t.L1Data.apparentPower, y0:0}
+                            }
+                        )}
+                        color={'green'}
+                    />
+                </div>
+                <div>
+                    <GenericFlexWidthChart
+                        data={details.telemetries.map(
+                            function(t,i) {
+                                return {x: i, y:CtoF(t.temperature), y0:0}
+                            }
+                        )}
+                        color={'blue'}
+                    />
+                </div>
+
             </div>
         )
     }
