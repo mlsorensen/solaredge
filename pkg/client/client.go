@@ -3,6 +3,7 @@ package client
 import (
 	"encoding/json"
 	"errors"
+	"fmt"
 	"io/ioutil"
 	"net/http"
 	"net/url"
@@ -20,7 +21,7 @@ type Client struct {
 
 func (c *Client) GetInventory() (inv Inventory, err error) {
 	var q = strings.Join([]string{baseurl, "site", c.siteId, "inventory"}, "/")
-	body, err := c.get(q, false)
+	body, err := c.get(q, false, nil)
 	if err != nil {
 		return inv, err
 	}
@@ -38,13 +39,25 @@ func (c *Client) GetInventory() (inv Inventory, err error) {
 func (c *Client) GetEquipmentTelemetry(serial string) (et EquipmentTelemetry, err error) {
 	var q = strings.Join([]string{baseurl, "equipment", c.siteId, serial, "data"}, "/")
 
-	body, err := c.get(q, true)
+	body, err := c.get(q, true, nil)
 	if err != nil {
 		return et, err
 	}
 
 	err = json.Unmarshal(body, &et)
 	return et, err
+}
+
+func (c *Client) GetBatteryTelemetry(serial string) (bt BatteryTelemetry, err error) {
+	var q = strings.Join([]string{baseurl, "site", c.siteId, "storageData"}, "/")
+
+	body, err := c.get(q, true, map[string]string{"serials": serial})
+	if err != nil {
+		return bt, err
+	}
+
+	err = json.Unmarshal(body, &bt)
+	return bt, err
 }
 
 func (c *Client) isConfigured() bool {
@@ -54,7 +67,7 @@ func (c *Client) isConfigured() bool {
 	return true
 }
 
-func (c *Client) get(u string, needTime bool) ([]byte, error) {
+func (c *Client) get(u string, needTime bool, params map[string]string) ([]byte, error) {
 	if !c.isConfigured() {
 		return []byte{}, errors.New("client is not configured")
 	}
@@ -62,6 +75,10 @@ func (c *Client) get(u string, needTime bool) ([]byte, error) {
 	u = c.appendApiKey(u)
 	if needTime {
 		u = c.appendTimeFrame(u)
+	}
+
+	for k, v := range params {
+		u = u + fmt.Sprintf("&%s=%s", k, v)
 	}
 
 	resp, err := http.Get(u)

@@ -32,7 +32,8 @@ func main() {
 	api.HandleFunc("/inventory/inverters", routehandler.Inverters).Methods("GET")
 	api.HandleFunc("/inventory/batteries", routehandler.Batteries).Methods("GET")
 	api.HandleFunc("/inventory/meters", routehandler.Meters).Methods("GET")
-	api.HandleFunc("/inventory/inverters/{serial}/telemetry", routehandler.InventoryTelemetry).Methods("GET")
+	api.HandleFunc("/inventory/inverters/{serial}/telemetry", routehandler.InverterTelemetry).Methods("GET")
+	api.HandleFunc("/inventory/batteries/{serial}/telemetry", routehandler.BatteryTelemetry).Methods("GET")
 
 	http.Handle("/", r)
 

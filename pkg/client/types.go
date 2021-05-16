@@ -41,16 +41,45 @@ type Inverter struct {
 	ConnectedOptimizers uint   `json:"connectedOptimizers,omitempty"`
 }
 
+type BatteryTelemetry struct {
+	StorageData BatteryCollection `json:"storageData"`
+}
+
+type BatteryCollection struct {
+	BatteryCount uint                   `json:"batteryCount"`
+	Batteries    []BatteryWithTelemetry `json:"batteries"`
+}
+
+type BatteryWithTelemetry struct {
+	Nameplate      float32                `json:"nameplate"`
+	SerialNumber   string                 `json:"serialNumber"`
+	ModelNumber    string                 `json:"modelNumber"`
+	TelemetryCount uint                   `json:"telemetryCount"`
+	Telemetries    []BatteryTelemetryItem `json:"telemetries"`
+}
+
+type BatteryTelemetryItem struct {
+	TimeStamp                string  `json:"timeStamp"`
+	Power                    float32 `json:"power"`
+	BatteryState             uint    `json:"batteryState"`
+	LifeTimeEnergyDischarged uint    `json:"lifeTimeEnergyDischarged"`
+	LifeTimeEnergyCharged    uint    `json:"lifeTimeEnergyCharged"`
+	BatteryPercentageState   float32 `json:"batteryPercentageState"`
+	FullPackEnergyAvailable  float32 `json:"fullPackEnergyAvailable"`
+	InternalTemp             float32 `json:"internalTemp"`
+	ACGridCharging           float32 `json:"ACGridCharging"`
+}
+
 type EquipmentTelemetry struct {
 	Data TelemetryCollection `json:"data"`
 }
 
 type TelemetryCollection struct {
-	Count       uint                `json:"count"`
-	Telemetries []InverterTelemetry `json:"telemetries"`
+	Count       uint                    `json:"count"`
+	Telemetries []InverterTelemetryItem `json:"telemetries"`
 }
 
-type InverterTelemetry struct {
+type InverterTelemetryItem struct {
 	Date                  string    `json:"date,omitempty"`
 	TotalActivePower      float32   `json:"totalActivePower,omitempty"`
 	DcVoltage             float32   `json:"dcVoltage,omitempty"`
