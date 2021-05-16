@@ -1,74 +1,73 @@
 package client
 
 type InventoryData struct {
-	Inventory Inventory
+	Inventory Inventory `json:"Inventory"`
 }
 type Inventory struct {
-	Meters    []Meter
-	Batteries []Battery
-	Inverters []Inverter
+	Meters    []Meter    `json:"meters"`
+	Batteries []Battery  `json:"batteries"`
+	Inverters []Inverter `json:"inverters"`
 }
 
 type Meter struct {
-	Name                       string
-	Manufacturer               string
-	Model                      string
-	FirmwareVersion            string
-	ConnectedTo                string
-	ConnectedSolaredgeDeviceSN string
-	Type                       string
-	Form                       string
+	Name                       string `json:"name,omitempty"`
+	Model                      string `json:"model,omitempty"`
+	FirmwareVersion            string `json:"firmwareVersion,omitempty"`
+	ConnectedTo                string `json:"connectedTo,omitempty"`
+	ConnectedSolaredgeDeviceSN string `json:"ConnectedSolaredgeDeviceSN,omitempty"`
+	Type                       string `json:"type,omitempty"`
+	Form                       string `json:"form,omitempty"`
 	SerialNumber               string `json:"SN,omitempty"`
 }
 
 type Battery struct {
-	Name                string
-	Manufacturer        string
-	Model               string
-	FirmwareVersion     string
-	ConnectedTo         string
-	ConnectedInverterSn string
-	NameplateCapacity   float32
-	SerialNumber        string `json:"SN,omitempty"`
+	Name                string  `json:"name,omitempty"`
+	Manufacturer        string  `json:"manufacturer,omitempty"`
+	Model               string  `json:"model,omitempty"`
+	FirmwareVersion     string  `json:"firmwareVersion,omitempty"`
+	ConnectedTo         string  `json:"connectedTo,omitempty"`
+	ConnectedInverterSn string  `json:"connectedInverterSn,omitempty"`
+	NameplateCapacity   float32 `json:"nameplateCapacity,omitempty"`
+	SerialNumber        string  `json:"SN,omitempty"`
 }
 
 type Inverter struct {
-	Name                string
-	Manufacturer        string
-	Model               string
-	CommunicationMethod string
-	CpuVersion          string
+	Name                string `json:"name,omitempty"`
+	Manufacturer        string `json:"manufacturer,omitempty"`
+	Model               string `json:"model,omitempty"`
+	CommunicationMethod string `json:"communicationMethod,omitempty"`
+	CpuVersion          string `json:"cpuVersion,omitempty"`
 	SerialNumber        string `json:"SN,omitempty"`
-	ConnectedOptimizers uint
+	ConnectedOptimizers uint   `json:"connectedOptimizers,omitempty"`
 }
 
 type EquipmentTelemetry struct {
-	Data TelemetryCollection
+	Data TelemetryCollection `json:"data"`
 }
 
 type TelemetryCollection struct {
-	Count       uint
-	Telemetries []InverterTelemetry
+	Count       uint                `json:"count"`
+	Telemetries []InverterTelemetry `json:"telemetries"`
 }
 
 type InverterTelemetry struct {
-	Date                  string
-	TotalActivePower      float32
-	DcVoltage             float32
-	GroundFaultResistance float32
-	PowerLimit            float32
-	TotalEnergy           float32
-	Temperature           float32
-	InverterMode          string
-	OperationMode         uint
-	L1Data                PhaseData
+	Date                  string    `json:"date,omitempty"`
+	TotalActivePower      float32   `json:"totalActivePower,omitempty"`
+	DcVoltage             float32   `json:"dcVoltage,omitempty"`
+	GroundFaultResistance float32   `json:"groundFaultResistance,omitempty"`
+	PowerLimit            float32   `json:"powerLimit,omitempty"`
+	TotalEnergy           float32   `json:"totalEnergy,omitempty"`
+	Temperature           float32   `json:"temperature,omitempty"`
+	InverterMode          string    `json:"inverterMode,omitempty"`
+	OperationMode         uint      `json:"operationMode,omitempty"`
+	L1Data                PhaseData `json:"L1Data"`
 }
 
 type PhaseData struct {
-	AcCurrent     float32
-	AcFrequency   float32
-	ApparentPower float32
-	ActivePower   float32
-	ReactivePower float32
-	CosPhi        float32
+	AcCurrent     float32 `json:"acCurrent,omitempty"`
+	AcFrequency   float32 `json:"acFrequency,omitempty"`
+	ApparentPower float32 `json:"apparentPower,omitempty"`
+	ActivePower   float32 `json:"activePower,omitempty"`
+	ReactivePower float32 `json:"reactivePower,omitempty"`
+	CosPhi        float32 `json:"cosPhi,omitempty"`
 }

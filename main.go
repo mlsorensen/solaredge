@@ -16,11 +16,11 @@ const (
 )
 
 func main() {
-	c := client.Client{}
-
+	solarEdgeClient := client.Client{}
 	// client checks if it is configured and returns errors, no need to check if these are empty
-	c.SetSiteId(os.Getenv(siteIdEnvVar))
-	c.SetApiKey(os.Getenv(apiKeyEnvVar))
+	solarEdgeClient.SetSiteId(os.Getenv(siteIdEnvVar))
+	solarEdgeClient.SetApiKey(os.Getenv(apiKeyEnvVar))
+	routehandler.Init(&solarEdgeClient)
 
 	r := mux.NewRouter()
 
@@ -29,7 +29,10 @@ func main() {
 
 	api := r.PathPrefix("/api").Subrouter()
 	api.HandleFunc("/inventory", routehandler.Inventory).Methods("GET")
-	api.HandleFunc("/equipmentTelemetry/{serial}", routehandler.EquipmentTelemetry).Methods("GET")
+	api.HandleFunc("/inventory/inverters", routehandler.Inverters).Methods("GET")
+	api.HandleFunc("/inventory/batteries", routehandler.Batteries).Methods("GET")
+	api.HandleFunc("/inventory/meters", routehandler.Meters).Methods("GET")
+	api.HandleFunc("/inventory/inverters/{serial}/telemetry", routehandler.InventoryTelemetry).Methods("GET")
 
 	http.Handle("/", r)
 
