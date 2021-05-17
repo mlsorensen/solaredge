@@ -1,6 +1,6 @@
 'use strict';
 const { useState, useEffect } = React
-const {XYPlot, XAxis, YAxis, HorizontalGridLines, FlexibleWidthXYPlot, LineSeries, VerticalBarSeries, AreaSeries} = reactVis;
+const {XYPlot, XAxis, YAxis, HorizontalGridLines, VerticalGridLines, FlexibleWidthXYPlot, LineSeries, LineMarkSeries, VerticalBarSeries, AreaSeries} = reactVis;
 
 function CtoF(c) {
     return ((c * 9/5) + 32).toFixed(2)
@@ -86,10 +86,11 @@ function GenericFlexWidthAreaChart(props) {
     return (
         <FlexibleWidthXYPlot height={150} className="row"  >
             <HorizontalGridLines />
-            <XAxis hideTicks/>
+            <VerticalGridLines tickTotal={3}/>
+            <XAxis tickTotal={3}/>
             <YAxis />
             <AreaSeries opacity={0.4} data={props.data} color={props.color}/>
-            <LineSeries opacity={1} strokeWidth={.5} data={props.data} color={props.color}/>
+            <LineMarkSeries size={0} opacity={1} strokeWidth={.5} data={props.data} color={props.color}/>
         </FlexibleWidthXYPlot>
     )
 }
@@ -98,6 +99,7 @@ function GenericFlexWidthAreaChart2(props) {
     return (
         <FlexibleWidthXYPlot height={150} className="row"  >
             <HorizontalGridLines />
+            <VerticalGridLines tickTotal={3}/>
             <XAxis hideTicks/>
             <YAxis />
             <AreaSeries opacity={0.4} data={props.dataNegative} color={props.colorNegative}/>
@@ -157,7 +159,7 @@ function InverterDetail(props) {
                     <GenericFlexWidthAreaChart
                         data={details.telemetries.map(
                             function(t,i) {
-                                return {x: i, y:CtoF(t.temperature), y0:0}
+                                return {x: i, y:CtoF(t.temperature), y0:60}
                             }
                         )}
                         color={'blue'}
