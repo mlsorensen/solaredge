@@ -162,7 +162,7 @@ func (c *client) appendTimeFrame(query string) string {
 
 func getStartTimeStr() string {
 	end := time.Now()
-	start := end.Add(-12 * time.Hour)
+	start := end.Add(-24 * time.Hour)
 	return url.QueryEscape(start.Format(timeFormat))
 }
 

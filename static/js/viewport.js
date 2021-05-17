@@ -1,6 +1,6 @@
 'use strict';
 const { useState, useEffect } = React
-const {XYPlot, XAxis, YAxis, HorizontalGridLines, FlexibleWidthXYPlot, LineMarkSeries, VerticalBarSeries, AreaSeries} = reactVis;
+const {XYPlot, XAxis, YAxis, HorizontalGridLines, FlexibleWidthXYPlot, LineSeries, VerticalBarSeries, AreaSeries} = reactVis;
 
 function CtoF(c) {
     return ((c * 9/5) + 32).toFixed(2)
@@ -29,7 +29,11 @@ function Battery(props) {
         return <div className={"inverter-detail"}>Loading...</div>
     } else {
         let last = details.telemetries[details.telemetries.length - 1]
-        let powerClassName = (last.power < 0 ? "text-warning" : "") + (last.power > 0 ? "text-success" : "")
+        //let powerClassName = (last.power < 0 ? "text-warning" : "") + (last.power > 0 ? "text-success" : "")
+        let powerStyle = {'color':'black'}
+        if (last.power !== 0) {
+            powerStyle = (last.power >= 0 ? {'color':'#52c243'} : {'color':'#c14a66'})
+        }
         return (
                 <span className={"border-left border-dark"}>
                 <div className={"row bg-primary bg-gradient text-white"}>
@@ -39,7 +43,7 @@ function Battery(props) {
                     <div className={"col-12"}>{props.battery.SN}</div>
                 </div>
                 <div className={"row"}>
-                    <div className={"col-12"}>Rate: <span className={powerClassName}> {last.power.toFixed(2)}VA </span></div>
+                    <div className={"col-12"}>Rate: <span style={powerStyle}> {last.power.toFixed(2)}VA </span></div>
                 </div>
                 <div className={"row"}>
                     <div className={"col-12"}>Level: {last.batteryPercentageState.toFixed(2)}%</div>
@@ -48,17 +52,23 @@ function Battery(props) {
                     <div className={"col-12"}>Temp: {CtoF(last.internalTemp)}&deg;F</div>
                 </div>
                 <div>
-                    <GenericFlexWidthChart
-                        data={details.telemetries.map(
+                    <GenericFlexWidthAreaChart2
+                        dataPositive={details.telemetries.map(
                             function(t,i) {
-                                return {x: i, y: t.power, y0:0}
+                                return {x: i, y: t.power > 0 ? t.power : 0 , y0:0}
                             }
                         )}
-                        color={'#4b7fa1'}
+                        dataNegative={details.telemetries.map(
+                            function(t,i) {
+                                return {x: i, y: t.power < 0 ? t.power : 0, y0: 0}
+                            }
+                        )}
+                        colorPositive={'#52c243'}
+                        colorNegative={'#c14a66'}
                     />
                 </div>
                 <div>
-                    <GenericFlexWidthChart
+                    <GenericFlexWidthAreaChart
                         data={details.telemetries.map(
                             function(t,i) {
                                 return {x: i, y: t.batteryPercentageState, y0:0}
@@ -72,13 +82,28 @@ function Battery(props) {
     }
 }
 
-function GenericFlexWidthChart(props) {
+function GenericFlexWidthAreaChart(props) {
     return (
         <FlexibleWidthXYPlot height={150} className="row"  >
             <HorizontalGridLines />
             <XAxis hideTicks/>
             <YAxis />
-            <AreaSeries curve="curveNatural" data={props.data} color={props.color}/>
+            <AreaSeries opacity={0.4} data={props.data} color={props.color}/>
+            <LineSeries opacity={1} strokeWidth={.5} data={props.data} color={props.color}/>
+        </FlexibleWidthXYPlot>
+    )
+}
+
+function GenericFlexWidthAreaChart2(props) {
+    return (
+        <FlexibleWidthXYPlot height={150} className="row"  >
+            <HorizontalGridLines />
+            <XAxis hideTicks/>
+            <YAxis />
+            <AreaSeries opacity={0.4} data={props.dataNegative} color={props.colorNegative}/>
+            <AreaSeries opacity={0.4} data={props.dataPositive} color={props.colorPositive}/>
+            <LineSeries opacity={1} strokeWidth={.5} data={props.dataNegative} color={props.colorNegative}/>
+            <LineSeries opacity={1} strokeWidth={.5} data={props.dataPositive} color={props.colorPositive}/>
         </FlexibleWidthXYPlot>
     )
 }
@@ -117,17 +142,19 @@ function InverterDetail(props) {
                     <div className="col-6">Panels: {props.inverter.connectedOptimizers}</div>
                 </div>
                 <div>
-                    <GenericFlexWidthChart
-                        data={details.telemetries.map(
+                    <GenericFlexWidthAreaChart2
+                        dataPositive={details.telemetries.map(
                             function(t,i) {
-                                return {x: i, y: t.L1Data.apparentPower, y0:0}
+                                return {x: i, y: t.L1Data.apparentPower > 0 ? t.L1Data.apparentPower : 0 , y0: 0}
                             }
                         )}
-                        color={'green'}
+                        dataNegative={[]}
+                        colorPositive={'green'}
+                        colorNegative={'red'}
                     />
                 </div>
                 <div>
-                    <GenericFlexWidthChart
+                    <GenericFlexWidthAreaChart
                         data={details.telemetries.map(
                             function(t,i) {
                                 return {x: i, y:CtoF(t.temperature), y0:0}
@@ -152,8 +179,8 @@ function Inverter(props) {
                     <div className="col-6">Model: {props.inverter.model}</div>
                 </div>
                 <div className="row">
-                    <div className="col-8 inverter-container bg-light"><InverterDetail inverter={props.inverter}/></div>
-                    <div className="col-4 battery-container border-dark border-left" style={{"backgroundColor": "#ececec","borderLeft":"1px solid black"}}>
+                    <div className="col-6 inverter-container bg-light"><InverterDetail inverter={props.inverter}/></div>
+                    <div className="col-6 battery-container border-dark border-left" style={{"backgroundColor": "#ececec","borderLeft":"1px solid black"}}>
                         <Battery battery={props.battery}/>
                     </div>
                 </div>
