@@ -1,9 +1,29 @@
 'use strict';
-const { useState, useEffect } = React
+const { useState, useEffect, useRef } = React
 const {XYPlot, XAxis, YAxis, HorizontalGridLines, VerticalGridLines, FlexibleWidthXYPlot, LineSeries, LineMarkSeries, VerticalBarSeries, AreaSeries} = reactVis;
 
 function CtoF(c) {
     return ((c * 9/5) + 32).toFixed(2)
+}
+
+function useInterval(callback, delay) {
+  const savedCallback = useRef();
+
+  // Remember the latest callback.
+  useEffect(() => {
+    savedCallback.current = callback;
+  }, [callback]);
+
+  // Set up the interval.
+  useEffect(() => {
+    function tick() {
+      savedCallback.current();
+    }
+    if (delay !== null) {
+      let id = setInterval(tick, delay);
+      return () => clearInterval(id);
+    }
+  }, [delay]);
 }
 
 function Battery(props) {
@@ -22,6 +42,19 @@ function Battery(props) {
                 }
             )
     },[])
+
+    useInterval(() => {
+        fetch("../api/telemetry/batteries/" + props.battery.SN)
+            .then(res => res.json())
+            .then(
+                (result) => {
+                    setDetails(result);
+                },
+                (error) => {
+                    setError(error);
+                }
+            )
+    },30000)
 
     if (error) {
         return <div className={"inverter-detail"}>error</div>
@@ -127,6 +160,19 @@ function InverterDetail(props) {
             )
     },[])
 
+    useInterval(() => {
+        fetch("../api/telemetry/inverters/" + props.inverter.SN)
+            .then(res => res.json())
+            .then(
+                (result) => {
+                    setDetails(result);
+                },
+                (error) => {
+                    setError(error);
+                }
+            )
+    },30000)
+
     if (error) {
         return <div className={"inverter-detail"}>error</div>
     } else if (details.count === 0) {
@@ -222,6 +268,21 @@ function App() {
                 }
             )
     },[])
+
+    useInterval(() => {
+        fetch("../api/inventory")
+            .then(res => res.json())
+            .then(
+                (result) => {
+                    setIsLoaded(true);
+                    setItems(result);
+                },
+                (error) => {
+                    setIsLoaded(true);
+                    setError(error);
+                }
+            )
+    },30000)
 
     if (error) {
         return <div className={"container"}>error</div>
