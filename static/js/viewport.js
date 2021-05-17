@@ -143,6 +143,18 @@ function InverterDetail(props) {
                     <div className="col-6">Power: {last.L1Data.apparentPower.toFixed(2)}VA</div>
                     <div className="col-6">Panels: {props.inverter.connectedOptimizers}</div>
                 </div>
+                <div className="row">
+                    <div className="col-6">AC Voltage: {(last.L1Data.apparentPower/last.L1Data.acCurrent).toFixed(2)}</div>
+                    <div className="col-6">DC Voltage: {last.dcVoltage}</div>
+                </div>
+                <div className="row">
+                    <div className="col-6">Firmware: {props.inverter.cpuVersion}</div>
+                    <div className="col-6">Last Update: {last.date}</div>
+                </div>
+                <div className="row">
+                    <div className="col-6">-</div>
+                    <div className="col-6"></div>
+                </div>
                 <div>
                     <GenericFlexWidthAreaChart2
                         dataPositive={details.telemetries.map(
