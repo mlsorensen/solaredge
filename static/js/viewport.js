@@ -43,7 +43,7 @@ function Battery(props) {
                     <div className={"col-12"}>{props.battery.SN}</div>
                 </div>
                 <div className={"row"}>
-                    <div className={"col-12"}>Rate: <span style={powerStyle}> {last.power.toFixed(2)}VA </span></div>
+                    <div className={"col-12"}>Rate: <span style={powerStyle}> {last.power.toFixed(2)}W </span></div>
                 </div>
                 <div className={"row"}>
                     <div className={"col-12"}>Level: {last.batteryPercentageState.toFixed(2)}%</div>
