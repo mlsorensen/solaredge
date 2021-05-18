@@ -152,12 +152,12 @@ function InverterEnergyChart(props) {
             <VerticalGridLines tickTotal={3}/>
             <XAxis hideTicks/>
             <YAxis title={props.title}/>
-            <AreaSeries opacity={0.4} data={props.data1} color={props.color1}/>
-            <AreaSeries opacity={0.4} data={props.data2} color={props.color2}/>
-            <AreaSeries opacity={0.4} data={props.data3} color={props.color3}/>
-            <LineSeries opacity={1} strokeWidth={.5} data={props.data1} color={props.color1}/>
-            <LineSeries opacity={1} strokeWidth={.5} data={props.data2} color={props.color2}/>
-            <LineSeries opacity={1} strokeWidth={.5} data={props.data3} color={props.color3}/>
+            <AreaSeries opacity={0.3} data={props.data1} color={props.color1}/>
+            <AreaSeries opacity={0.3} data={props.data2} color={props.color2}/>
+            <AreaSeries opacity={0.3} data={props.data3} color={props.color3}/>
+            <LineSeries opacity={1} strokeWidth={1} data={props.data1} color={props.color1}/>
+            <LineSeries opacity={1} strokeWidth={1} data={props.data2} color={props.color2}/>
+            <LineSeries opacity={1} strokeWidth={1} data={props.data3} color={props.color3}/>
         </FlexibleWidthXYPlot>
     )
 }
@@ -256,7 +256,7 @@ function InverterDetail(props) {
                         )}
                         data3={batteryDetails.telemetries.map(
                             function(t,i) {
-                                return {x: i, y: t.power < 0 ? t.power : 0, y0: 0}
+                                return {x: i, y: t.power < 0 ? Math.abs(t.power) : 0, y0: 0}
                             }
                         )}
 
