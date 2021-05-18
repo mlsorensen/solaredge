@@ -1,6 +1,6 @@
 'use strict';
 const { useState, useEffect, useRef } = React
-const {XYPlot, XAxis, YAxis, HorizontalGridLines, VerticalGridLines, FlexibleWidthXYPlot, LineSeries, LineMarkSeries, VerticalBarSeries, AreaSeries} = reactVis;
+const {XYPlot, XAxis, YAxis, HorizontalGridLines, ChartLabel, VerticalGridLines, FlexibleWidthXYPlot, LineSeries, LineMarkSeries, VerticalBarSeries, AreaSeries} = reactVis;
 
 function CtoF(c) {
     return ((c * 9/5) + 32).toFixed(2)
@@ -98,6 +98,7 @@ function Battery(props) {
                         )}
                         colorPositive={'#52c243'}
                         colorNegative={'#c14a66'}
+                        title={"Power"}
                     />
                 </div>
                 <div>
@@ -108,6 +109,7 @@ function Battery(props) {
                             }
                         )}
                         color={'#4ba19e'}
+                        title={"Battery %"}
                     />
                 </div>
                 </span>
@@ -121,7 +123,7 @@ function GenericFlexWidthAreaChart(props) {
             <HorizontalGridLines />
             <VerticalGridLines tickTotal={3}/>
             <XAxis tickTotal={3}/>
-            <YAxis />
+            <YAxis title={props.title}/>
             <AreaSeries opacity={0.4} data={props.data} color={props.color}/>
             <LineMarkSeries size={0} opacity={1} strokeWidth={.5} data={props.data} color={props.color}/>
         </FlexibleWidthXYPlot>
@@ -134,7 +136,7 @@ function GenericFlexWidthAreaChart2(props) {
             <HorizontalGridLines />
             <VerticalGridLines tickTotal={3}/>
             <XAxis hideTicks/>
-            <YAxis />
+            <YAxis title={props.title}/>
             <AreaSeries opacity={0.4} data={props.dataNegative} color={props.colorNegative}/>
             <AreaSeries opacity={0.4} data={props.dataPositive} color={props.colorPositive}/>
             <LineSeries opacity={1} strokeWidth={.5} data={props.dataNegative} color={props.colorNegative}/>
@@ -143,16 +145,44 @@ function GenericFlexWidthAreaChart2(props) {
     )
 }
 
+function InverterEnergyChart(props) {
+    return (
+        <FlexibleWidthXYPlot height={300} className="row"  >
+            <HorizontalGridLines />
+            <VerticalGridLines tickTotal={3}/>
+            <XAxis hideTicks/>
+            <YAxis title={props.title}/>
+            <AreaSeries opacity={0.4} data={props.data1} color={props.color1}/>
+            <AreaSeries opacity={0.4} data={props.data2} color={props.color2}/>
+            <AreaSeries opacity={0.4} data={props.data3} color={props.color3}/>
+            <LineSeries opacity={1} strokeWidth={.5} data={props.data1} color={props.color1}/>
+            <LineSeries opacity={1} strokeWidth={.5} data={props.data2} color={props.color2}/>
+            <LineSeries opacity={1} strokeWidth={.5} data={props.data3} color={props.color3}/>
+        </FlexibleWidthXYPlot>
+    )
+}
+
 function InverterDetail(props) {
     const [error, setError] = useState(null);
-    const [details, setDetails] = useState({ count: 0, telemetries: []});
+    const [inverterDetails, setInverterDetails] = useState({ count: 0, telemetries: []});
+    const [batteryDetails, setBatteryDetails] = useState({ telemetryCount: 0, telemetries: []});
 
     useEffect(() => {
         fetch("../api/telemetry/inverters/" + props.inverter.SN)
             .then(res => res.json())
             .then(
                 (result) => {
-                    setDetails(result);
+                    setInverterDetails(result);
+                },
+                (error) => {
+                    setError(error);
+                }
+            )
+        fetch("../api/telemetry/batteries/" + props.battery.SN)
+            .then(res => res.json())
+            .then(
+                (result) => {
+                    setBatteryDetails(result);
                 },
                 (error) => {
                     setError(error);
@@ -165,7 +195,17 @@ function InverterDetail(props) {
             .then(res => res.json())
             .then(
                 (result) => {
-                    setDetails(result);
+                    setInverterDetails(result);
+                },
+                (error) => {
+                    setError(error);
+                }
+            )
+        fetch("../api/telemetry/batteries/" + props.battery.SN)
+            .then(res => res.json())
+            .then(
+                (result) => {
+                    setBatteryDetails(result);
                 },
                 (error) => {
                     setError(error);
@@ -175,52 +215,66 @@ function InverterDetail(props) {
 
     if (error) {
         return <div className={"inverter-detail"}>error</div>
-    } else if (details.count === 0) {
+    } else if (inverterDetails.count === 0 || batteryDetails.telemetryCount === 0) {
         return <div className={"inverter-detail"}>Loading...</div>
     } else {
-        let last = details.telemetries[details.telemetries.length - 1]
+        let inverterLast = inverterDetails.telemetries[inverterDetails.telemetries.length - 1]
+        //let batteryLast = batteryDetails.telemetries[batteryDetails.telemetries.length - 1]
         return (
             <div className={"inverter-detail"}>
                 <div className="row">
-                    <div className="col-6">Mode: {last.inverterMode}</div>
-                    <div className="col-6">Temp: {CtoF(last.temperature)}&deg;F</div>
+                    <div className="col-6">Mode: {inverterLast.inverterMode}</div>
+                    <div className="col-6">Temp: {CtoF(inverterLast.temperature)}&deg;F</div>
                 </div>
                 <div className="row">
-                    <div className="col-6">Power: {last.L1Data.apparentPower.toFixed(2)}VA</div>
+                    <div className="col-6">Power: {inverterLast.L1Data.apparentPower.toFixed(2)}VA</div>
                     <div className="col-6">Panels: {props.inverter.connectedOptimizers}</div>
                 </div>
                 <div className="row">
-                    <div className="col-6">AC Voltage: {(last.L1Data.apparentPower/last.L1Data.acCurrent).toFixed(2)}</div>
-                    <div className="col-6">DC Voltage: {last.dcVoltage}</div>
+                    <div className="col-6">AC Voltage: {(inverterLast.L1Data.apparentPower/inverterLast.L1Data.acCurrent).toFixed(2)}</div>
+                    <div className="col-6">DC Voltage: {inverterLast.dcVoltage}</div>
                 </div>
                 <div className="row">
                     <div className="col-6">Firmware: {props.inverter.cpuVersion}</div>
-                    <div className="col-6">Last Update: {last.date}</div>
+                    <div className="col-6">Last Update: {inverterLast.date}</div>
                 </div>
                 <div className="row">
                     <div className="col-6">-</div>
                     <div className="col-6"></div>
                 </div>
                 <div>
-                    <GenericFlexWidthAreaChart2
-                        dataPositive={details.telemetries.map(
+                    <InverterEnergyChart
+                        data1={inverterDetails.telemetries.map(
                             function(t,i) {
                                 return {x: i, y: t.L1Data.apparentPower > 0 ? t.L1Data.apparentPower : 0 , y0: 0}
                             }
                         )}
-                        dataNegative={[]}
-                        colorPositive={'green'}
-                        colorNegative={'red'}
+                        data2={batteryDetails.telemetries.map(
+                            function(t,i) {
+                                return {x: i, y: t.power > 0 ? t.power : 0 , y0:0}
+                            }
+                        )}
+                        data3={batteryDetails.telemetries.map(
+                            function(t,i) {
+                                return {x: i, y: t.power < 0 ? t.power : 0, y0: 0}
+                            }
+                        )}
+
+                        color1={'#3e619c'}
+                        color2={'#52c243'}
+                        color3={'#c14a66'}
+                        title={"Power"}
                     />
                 </div>
                 <div>
                     <GenericFlexWidthAreaChart
-                        data={details.telemetries.map(
+                        data={inverterDetails.telemetries.map(
                             function(t,i) {
                                 return {x: i, y:CtoF(t.temperature), y0:60}
                             }
                         )}
                         color={'blue'}
+                        title={"Temp °F"}
                     />
                 </div>
 
@@ -239,8 +293,8 @@ function Inverter(props) {
                     <div className="col-6">Model: {props.inverter.model}</div>
                 </div>
                 <div className="row">
-                    <div className="col-6 inverter-container bg-light"><InverterDetail inverter={props.inverter}/></div>
-                    <div className="col-6 battery-container border-dark border-left" style={{"backgroundColor": "#ececec","borderLeft":"1px solid black"}}>
+                    <div className="col-8 inverter-container bg-light"><InverterDetail inverter={props.inverter} battery={props.battery}/></div>
+                    <div className="col-4 battery-container border-dark border-left" style={{"backgroundColor": "#ececec","borderLeft":"1px solid black"}}>
                         <Battery battery={props.battery}/>
                     </div>
                 </div>
