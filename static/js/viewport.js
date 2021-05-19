@@ -1,6 +1,6 @@
 'use strict';
 const { useState, useEffect, useRef } = React
-const {XYPlot, XAxis, YAxis, HorizontalGridLines, ChartLabel, VerticalGridLines, FlexibleWidthXYPlot, LineSeries, LineMarkSeries, VerticalBarSeries, AreaSeries} = reactVis;
+const {DiscreteColorLegend, XAxis, YAxis, HorizontalGridLines, VerticalGridLines, FlexibleWidthXYPlot, LineSeries, LineMarkSeries, AreaSeries} = reactVis;
 
 function CtoF(c) {
     return ((c * 9/5) + 32).toFixed(2)
@@ -149,6 +149,7 @@ function InverterEnergyChart(props) {
     return (
         <FlexibleWidthXYPlot height={300} className="row"  >
             <HorizontalGridLines />
+            <DiscreteColorLegend items={props.legend} orientation={"horizontal"} style={{position: 'absolute', left: '60%', top: '15px'}}/>
             <VerticalGridLines tickTotal={5}/>
             <XAxis tickTotal={5} tickFormat={formatXAxisLabel}/>
             <YAxis title={props.title}/>
@@ -245,10 +246,7 @@ function InverterDetail(props) {
                     <div className="col-6">Firmware: {props.inverter.cpuVersion}</div>
                     <div className="col-6">Last Update: {inverterLast.date}</div>
                 </div>
-                <div className="row">
-                    <div className="col-6">-</div>
-                    <div className="col-6"></div>
-                </div>
+
                 <div>
                     <InverterEnergyChart
                         data1={inverterDetails.telemetries.map(
@@ -271,6 +269,11 @@ function InverterDetail(props) {
                         color2={'#e07932'}
                         color3={'#c14a66'}
                         title={"Power"}
+                        legend={[
+                            {"title": "AC output", "color": '#3e619c'},
+                            {"title":"Battery Discharge","color": '#e07932'},
+                            {"title":"Battery Charge","color": '#c14a66'}
+                        ]}
                     />
                 </div>
                 <div>
