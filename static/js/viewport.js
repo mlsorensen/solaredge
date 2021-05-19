@@ -121,8 +121,8 @@ function GenericFlexWidthAreaChart(props) {
     return (
         <FlexibleWidthXYPlot height={150} className="row"  >
             <HorizontalGridLines />
-            <VerticalGridLines tickTotal={3}/>
-            <XAxis tickTotal={3}/>
+            <VerticalGridLines tickTotal={5}/>
+            <XAxis tickTotal={5} tickFormat={formatXAxisLabel}/>
             <YAxis title={props.title}/>
             <AreaSeries opacity={0.4} data={props.data} color={props.color}/>
             <LineMarkSeries size={0} opacity={1} strokeWidth={.5} data={props.data} color={props.color}/>
@@ -134,8 +134,8 @@ function GenericFlexWidthAreaChart2(props) {
     return (
         <FlexibleWidthXYPlot height={150} className="row"  >
             <HorizontalGridLines />
-            <VerticalGridLines tickTotal={3}/>
-            <XAxis hideTicks/>
+            <VerticalGridLines tickTotal={5}/>
+            <XAxis tickTotal={5} tickFormat={formatXAxisLabel}/>
             <YAxis title={props.title}/>
             <AreaSeries opacity={0.4} data={props.dataNegative} color={props.colorNegative}/>
             <AreaSeries opacity={0.4} data={props.dataPositive} color={props.colorPositive}/>
@@ -149,8 +149,8 @@ function InverterEnergyChart(props) {
     return (
         <FlexibleWidthXYPlot height={300} className="row"  >
             <HorizontalGridLines />
-            <VerticalGridLines tickTotal={3}/>
-            <XAxis hideTicks/>
+            <VerticalGridLines tickTotal={5}/>
+            <XAxis tickTotal={5} tickFormat={formatXAxisLabel}/>
             <YAxis title={props.title}/>
             <AreaSeries opacity={0.3} data={props.data1} color={props.color1}/>
             <AreaSeries opacity={0.3} data={props.data2} color={props.color2}/>
@@ -160,6 +160,13 @@ function InverterEnergyChart(props) {
             <LineSeries opacity={1} strokeWidth={1} data={props.data3} color={props.color3}/>
         </FlexibleWidthXYPlot>
     )
+}
+
+function formatXAxisLabel(x) {
+    let minutes = (x - 288) * 5
+    let offset = -60000 * minutes
+    let label = new Date(Date.now() - offset)
+    return label.toLocaleString("en-US", {hour: "2-digit", minute:"2-digit"})
 }
 
 function InverterDetail(props) {
@@ -261,7 +268,7 @@ function InverterDetail(props) {
                         )}
 
                         color1={'#3e619c'}
-                        color2={'#52c243'}
+                        color2={'#e07932'}
                         color3={'#c14a66'}
                         title={"Power"}
                     />
