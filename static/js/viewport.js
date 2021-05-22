@@ -3,7 +3,8 @@ const { useState, useEffect, useRef } = React
 const {DiscreteColorLegend, XAxis, YAxis, HorizontalGridLines, VerticalGridLines, FlexibleWidthXYPlot, LineSeries, LineMarkSeries, AreaSeries} = reactVis;
 
 function CtoF(c) {
-    return ((c * 9/5) + 32).toFixed(2)
+    let f = ((c * 9/5) + 32).toFixed(2)
+    return parseFloat(f)
 }
 
 function useInterval(callback, delay) {
@@ -99,6 +100,7 @@ function Battery(props) {
                         colorPositive={'#52c243'}
                         colorNegative={'#c14a66'}
                         title={"Power"}
+                        hideXLabels={true}
                     />
                 </div>
                 <div>
@@ -119,11 +121,11 @@ function Battery(props) {
 
 function GenericFlexWidthAreaChart(props) {
     return (
-        <FlexibleWidthXYPlot height={150} className="row"  >
+        <FlexibleWidthXYPlot height={150} className="row px-1">
             <HorizontalGridLines />
-            <VerticalGridLines tickTotal={5}/>
-            <XAxis tickTotal={5} tickFormat={formatXAxisLabel}/>
-            <YAxis title={props.title}/>
+            <VerticalGridLines tickTotal={6}/>
+            {props.hideXLabels ? <XAxis hideTicks/> : <XAxis tickTotal={6} tickFormat={formatXAxisLabel}/>}
+            <YAxis tickTotal={5} title={props.title}/>
             <AreaSeries opacity={0.4} data={props.data} color={props.color}/>
             <LineMarkSeries size={0} opacity={1} strokeWidth={.5} data={props.data} color={props.color}/>
         </FlexibleWidthXYPlot>
@@ -132,10 +134,10 @@ function GenericFlexWidthAreaChart(props) {
 
 function GenericFlexWidthAreaChart2(props) {
     return (
-        <FlexibleWidthXYPlot height={150} className="row"  >
-            <HorizontalGridLines />
+        <FlexibleWidthXYPlot height={150} className="row px-1">
+
             <VerticalGridLines tickTotal={5}/>
-            <XAxis tickTotal={5} tickFormat={formatXAxisLabel}/>
+            {props.hideXLabels ? <XAxis hideTicks/> : <XAxis tickTotal={5} tickFormat={formatXAxisLabel}/>}
             <YAxis title={props.title}/>
             <AreaSeries opacity={0.4} data={props.dataNegative} color={props.colorNegative}/>
             <AreaSeries opacity={0.4} data={props.dataPositive} color={props.colorPositive}/>
@@ -147,11 +149,11 @@ function GenericFlexWidthAreaChart2(props) {
 
 function InverterEnergyChart(props) {
     return (
-        <FlexibleWidthXYPlot height={300} className="row"  >
+        <FlexibleWidthXYPlot height={300} className="row px-1">
             <HorizontalGridLines />
             <DiscreteColorLegend items={props.legend} orientation={"horizontal"} style={{position: 'absolute', left: '60%', top: '15px'}}/>
             <VerticalGridLines tickTotal={5}/>
-            <XAxis tickTotal={5} tickFormat={formatXAxisLabel}/>
+            {props.hideXLabels ? <XAxis hideTicks/> : <XAxis tickTotal={5} tickFormat={formatXAxisLabel}/>}
             <YAxis title={props.title}/>
             <AreaSeries opacity={0.3} data={props.data1} color={props.color1}/>
             <AreaSeries opacity={0.3} data={props.data2} color={props.color2}/>
@@ -227,7 +229,6 @@ function InverterDetail(props) {
         return <div className={"inverter-detail"}>Loading...</div>
     } else {
         let inverterLast = inverterDetails.telemetries[inverterDetails.telemetries.length - 1]
-        //let batteryLast = batteryDetails.telemetries[batteryDetails.telemetries.length - 1]
         return (
             <div className={"inverter-detail"}>
                 <div className="row">
@@ -269,6 +270,7 @@ function InverterDetail(props) {
                         color2={'#e07932'}
                         color3={'#c14a66'}
                         title={"Power"}
+                        hideXLabels={true}
                         legend={[
                             {"title": "AC output", "color": '#3e619c'},
                             {"title":"Battery Discharge","color": '#e07932'},
@@ -280,7 +282,7 @@ function InverterDetail(props) {
                     <GenericFlexWidthAreaChart
                         data={inverterDetails.telemetries.map(
                             function(t,i) {
-                                return {x: i, y:CtoF(t.temperature), y0:60}
+                                return {x: i, y:CtoF(t.temperature)}
                             }
                         )}
                         color={'blue'}
