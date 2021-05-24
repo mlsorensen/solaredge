@@ -229,6 +229,12 @@ function InverterDetail(props) {
         return <div className={"inverter-detail"}>Loading...</div>
     } else {
         let inverterLast = inverterDetails.telemetries[inverterDetails.telemetries.length - 1]
+	let apparentPower = 0
+	let acCurrent = 1
+	if (inverterLast.inverterMode == "MPPT") {
+	    apparentPower = inverterLast.L1Data.apparentPower
+	    acCurrent = inverterLast.L1Data.acCurrent
+	}
         return (
             <div className={"inverter-detail"}>
                 <div className="row">
@@ -236,11 +242,11 @@ function InverterDetail(props) {
                     <div className="col-6">Temp: {CtoF(inverterLast.temperature)}&deg;F</div>
                 </div>
                 <div className="row">
-                    <div className="col-6">Power: {inverterLast.L1Data.apparentPower.toFixed(2)}VA</div>
+                    <div className="col-6">Power: {apparentPower.toFixed(2)}VA</div>
                     <div className="col-6">Panels: {props.inverter.connectedOptimizers}</div>
                 </div>
                 <div className="row">
-                    <div className="col-6">AC Voltage: {(inverterLast.L1Data.apparentPower/inverterLast.L1Data.acCurrent).toFixed(2)}</div>
+                    <div className="col-6">AC Voltage: {(apparentPower/acCurrent).toFixed(2)}</div>
                     <div className="col-6">DC Voltage: {inverterLast.dcVoltage}</div>
                 </div>
                 <div className="row">
