@@ -100,7 +100,8 @@ function Battery(props) {
                         colorPositive={'#52c243'}
                         colorNegative={'#c14a66'}
                         title={"Power"}
-                        hideXLabels={true}
+                        xLabels={0}
+			xTicks={3}
                     />
                 </div>
                 <div>
@@ -112,6 +113,8 @@ function Battery(props) {
                         )}
                         color={'#4ba19e'}
                         title={"Battery %"}
+			xLabels={3}
+			xTicks={3}
                     />
                 </div>
                 </span>
@@ -123,8 +126,8 @@ function GenericFlexWidthAreaChart(props) {
     return (
         <FlexibleWidthXYPlot height={150} className="row px-1">
             <HorizontalGridLines />
-            <VerticalGridLines tickTotal={6}/>
-            {props.hideXLabels ? <XAxis hideTicks/> : <XAxis tickTotal={6} tickFormat={formatXAxisLabel}/>}
+            <VerticalGridLines tickTotal={props.xTicks}/>
+            {props.xLabels === 0 ? <XAxis hideTicks/> : <XAxis tickTotal={props.xLabels} tickFormat={formatXAxisLabel}/>}
             <YAxis tickTotal={5} title={props.title}/>
             <AreaSeries opacity={0.4} data={props.data} color={props.color}/>
             <LineMarkSeries size={0} opacity={1} strokeWidth={.5} data={props.data} color={props.color}/>
@@ -136,8 +139,8 @@ function GenericFlexWidthAreaChart2(props) {
     return (
         <FlexibleWidthXYPlot height={150} className="row px-1">
 
-            <VerticalGridLines tickTotal={5}/>
-            {props.hideXLabels ? <XAxis hideTicks/> : <XAxis tickTotal={5} tickFormat={formatXAxisLabel}/>}
+            <VerticalGridLines tickTotal={props.xTicks}/>
+            {props.xLabels === 0 ? <XAxis hideTicks/> : <XAxis tickTotal={props.xLabels} tickFormat={formatXAxisLabel}/>}
             <YAxis title={props.title}/>
             <AreaSeries opacity={0.4} data={props.dataNegative} color={props.colorNegative}/>
             <AreaSeries opacity={0.4} data={props.dataPositive} color={props.colorPositive}/>
@@ -151,9 +154,9 @@ function InverterEnergyChart(props) {
     return (
         <FlexibleWidthXYPlot height={300} className="row px-1">
             <HorizontalGridLines />
-            <DiscreteColorLegend items={props.legend} orientation={"horizontal"} style={{position: 'absolute', left: '60%', top: '15px'}}/>
-            <VerticalGridLines tickTotal={5}/>
-            {props.hideXLabels ? <XAxis hideTicks/> : <XAxis tickTotal={5} tickFormat={formatXAxisLabel}/>}
+            <DiscreteColorLegend items={props.legend} orientation={"horizontal"} style={{position: 'absolute', left: '50px', bottom: '0px'}}/>
+            <VerticalGridLines tickTotal={props.xTicks}/>
+            {props.xLabels === 0 ? <XAxis hideTicks/> : <XAxis tickTotal={props.xLabels} tickFormat={formatXAxisLabel}/>}
             <YAxis title={props.title}/>
             <AreaSeries opacity={0.3} data={props.data1} color={props.color1}/>
             <AreaSeries opacity={0.3} data={props.data2} color={props.color2}/>
@@ -276,11 +279,12 @@ function InverterDetail(props) {
                         color2={'#e07932'}
                         color3={'#c14a66'}
                         title={"Power"}
-                        hideXLabels={true}
+                        xLabels={0}
+			xTicks={5}
                         legend={[
                             {"title": "AC output", "color": '#3e619c'},
-                            {"title":"Battery Discharge","color": '#e07932'},
-                            {"title":"Battery Charge","color": '#c14a66'}
+                            {"title": "Batt Charge","color": '#e07932'},
+                            {"title": "Batt Discharge","color": '#c14a66'}
                         ]}
                     />
                 </div>
@@ -293,6 +297,8 @@ function InverterDetail(props) {
                         )}
                         color={'blue'}
                         title={"Temp °F"}
+			xLabels={5}
+                        xTicks={5}
                     />
                 </div>
 
